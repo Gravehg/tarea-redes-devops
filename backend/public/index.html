@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple Calculator</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .form-container {
+        max-width: 300px;
+        margin: 0 auto;
+        text-align: center;
+      }
+      .form-container input,
+      .form-container button {
+        margin: 10px 0;
+        width: 80%;
+        padding: 10px;
+      }
+      .form-container button {
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="form-container">
+      <h1>Simple Calculator</h1>
+      <form id="calculatorForm">
+        <input
+          type="number"
+          id="number1"
+          placeholder="Enter first number"
+          required
+        />
+        <input
+          type="number"
+          id="number2"
+          placeholder="Enter second number"
+          required
+        />
+        <button type="button" onclick="calculate('add')">Add</button>
+        <button type="button" onclick="calculate('subtract')">Subtract</button>
+        <button type="button" onclick="calculate('multiply')">Multiply</button>
+        <button type="button" onclick="calculate('divide')">Divide</button>
+      </form>
+      <p id="result"></p>
+    </div>
+
+    <script>
+      async function calculate(operation) {
+        const num1 = parseFloat(document.getElementById("number1").value);
+        const num2 = parseFloat(document.getElementById("number2").value);
+
+        if (isNaN(num1) || isNaN(num2)) {
+          document.getElementById("result").innerText =
+            "Please enter valid numbers.";
+          return;
+        }
+
+        try {
+          const response = await fetch("http://localhost:3000/calculate", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              number1: num1,
+              number2: num2,
+              operation: operation,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch the result");
+          }
+
+          const data = await response.json();
+          document.getElementById(
+            "result"
+          ).innerText = `Result: ${data.result}`;
+        } catch (error) {
+          console.error("Error:", error);
+          document.getElementById(
+            "result"
+          ).innerText = `Error: ${error.message}`;
+        }
+      }
+    </script>
+  </body>
+</html>
